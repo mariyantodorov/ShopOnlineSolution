@@ -12,7 +12,7 @@ namespace ShopOnline.Api.Extensions
                     on product.CategoryId equals productCategory.Id
                     select new ProductDto
                     {
-                        Id  = product.Id,
+                        Id = product.Id,
                         Name = product.Name,
                         Description = product.Description,
                         ImageURL = product.ImageURL,
@@ -35,6 +35,41 @@ namespace ShopOnline.Api.Extensions
                 Qty = product.Qty,
                 CategoryId = product.CategoryId,
                 CategoryName = productCategory.Name
+            };
+        }
+
+        public static IEnumerable<CartItemDto> ConvertToDto(this IEnumerable<CartItem> cartItems, IEnumerable<Product> products)
+        {
+            return (from cartItem in cartItems
+                    join product in products
+                    on cartItem.ProductId equals product.Id
+                    select new CartItemDto
+                    {
+                        Id = cartItem.Id,
+                        CartId = cartItem.CartId,
+                        Price = product.Price,
+                        ProductDescription = product.Description,
+                        ProductId = product.Id,
+                        ProductImageURL = product.ImageURL,
+                        ProductName = product.Name,
+                        Qty = cartItem.Qty,
+                        TotalPrice = cartItem.Qty * product.Price
+                    }).ToList();
+        }
+
+        public static CartItemDto ConvertToDto(this CartItem cartItem, Product product)
+        {
+            return new CartItemDto
+            {
+                Id = cartItem.Id,
+                CartId = cartItem.CartId,
+                Price = product.Price,
+                ProductDescription = product.Description,
+                ProductId = product.Id,
+                ProductImageURL = product.ImageURL,
+                ProductName = product.Name,
+                Qty = cartItem.Qty,
+                TotalPrice = cartItem.Qty * product.Price
             };
         }
     }
