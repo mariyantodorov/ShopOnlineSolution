@@ -69,22 +69,32 @@ namespace ShopOnline.Api.Repositories
 
         public async Task<IEnumerable<CartItem>> GetItems(int userId)
         {
-            return await(from cart in this.shopOnlineDbContext.Carts
-                         join cartItem in this.shopOnlineDbContext.CartItems
-                         on cart.Id equals cartItem.CartId
-                         where cart.UserId == userId
-                         select new CartItem
-                         {
-                             Id = cartItem.Id,
-                             CartId = cartItem.CartId,
-                             ProductId = cartItem.ProductId,
-                             Qty = cartItem.Qty
-                         }).ToListAsync();
+            return await (from cart in this.shopOnlineDbContext.Carts
+                          join cartItem in this.shopOnlineDbContext.CartItems
+                          on cart.Id equals cartItem.CartId
+                          where cart.UserId == userId
+                          select new CartItem
+                          {
+                              Id = cartItem.Id,
+                              CartId = cartItem.CartId,
+                              ProductId = cartItem.ProductId,
+                              Qty = cartItem.Qty
+                          }).ToListAsync();
         }
 
-        public Task<CartItem> UpdateQty(int id, CartItemQtyUpdateDto cartItemQtyUpdateDto)
+        public async Task<CartItem> UpdateQty(int id, CartItemQtyUpdateDto cartItemQtyUpdateDto)
         {
-            throw new NotImplementedException();
+
+            var item = await this.shopOnlineDbContext.CartItems.FindAsync(id);
+
+            if (item != null)
+            {
+                item.Qty = cartItemQtyUpdateDto.Qty;
+                await this.shopOnlineDbContext.SaveChangesAsync();
+                return item;
+            }
+
+            return null;
         }
 
         private async Task<bool> CartItemExists(int cartId, int productId)
