@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using ShopOnline.Models.Dtos;
 using ShopOnline.Web.Services.Contracts;
 
@@ -6,6 +7,9 @@ namespace ShopOnline.Web.Pages
 {
     public class ShoppingCartBase : ComponentBase
     {
+        [Inject]
+        public IJSRuntime Js { get; set; }
+
         [Inject]
         public IShoppingCartService ShoppingCartService { get; set; }
 
@@ -59,6 +63,8 @@ namespace ShopOnline.Web.Pages
 
                     UpdateItemTotalPrice(returnedUpdateItemDto);
                     CalculateCartSummaryTotals();
+
+                    await Js.InvokeVoidAsync("MakeUpdateQtyButtonVisible", id, false);
                 }
                 else
                 {
@@ -75,6 +81,11 @@ namespace ShopOnline.Web.Pages
             {
                 ErrorMessage = ex.Message;
             }
+        }
+
+        protected async Task UpdateQty_Input(int id)
+        {
+            await Js.InvokeVoidAsync("MakeUpdateQtyButtonVisible", id, true);
         }
 
         private void RemoveCartItem(int id)
