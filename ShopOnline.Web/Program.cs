@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using ShopOnline.Web;
@@ -12,5 +13,10 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https:/
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
+
+builder.Services.AddBlazoredLocalStorage();
+
+builder.Services.AddScoped<IManagedCartItemsLocalStorageService, ManagedCartItemsLocalStorageService>();
+builder.Services.AddScoped<IManagedProductsLocalStorageService, ManagedProductsLocalStorageService>();
 
 await builder.Build().RunAsync();

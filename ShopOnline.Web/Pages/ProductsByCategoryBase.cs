@@ -2,7 +2,7 @@
 using ShopOnline.Models.Dtos;
 using ShopOnline.Web.Services.Contracts;
 
-namespace ShopOnline.Web.Shared
+namespace ShopOnline.Web.Pages
 {
     public class ProductsByCategoryBase : ComponentBase
     {
@@ -12,6 +12,9 @@ namespace ShopOnline.Web.Shared
         [Inject]
         public IProductService ProductService { get; set; }
 
+        [Inject]
+        public IManagedProductsLocalStorageService ManagedProductsLocalStorageService { get; set; }
+
         public IEnumerable<ProductDto> Products { get; set; }
         public string CategoryName { get; set; }
         public string ErrorMessage { get; set; }
@@ -20,7 +23,7 @@ namespace ShopOnline.Web.Shared
         {
             try
             {
-                Products = await ProductService.GetItemsByCategory(CategoryId);
+                Products = await GetProductCollectionByCategoryId(CategoryId);
 
                 if (Products != null && Products.Count() > 0)
                 {
@@ -35,6 +38,20 @@ namespace ShopOnline.Web.Shared
             catch (Exception ex)
             {
                 ErrorMessage = ex.Message;
+            }
+        }
+
+        private async Task<IEnumerable<ProductDto>> GetProductCollectionByCategoryId(int categoryId)
+        {
+            var productCollection = await ManagedProductsLocalStorageService.GetCollection();
+
+            if (productCollection != null)
+            {
+                return productCollection.Where(p => p.CategoryId == categoryId);
+            }
+            else
+            {
+                return await ProductService.GetItemsByCategory(categoryId);
             }
         }
     }
